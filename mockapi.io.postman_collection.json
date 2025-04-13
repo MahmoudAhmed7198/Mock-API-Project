@@ -1,0 +1,279 @@
+{
+	"info": {
+		"_postman_id": "99f44a66-8728-4fc3-966c-0f8a883f7949",
+		"name": "mockapi.io",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "36755344"
+	},
+	"item": [
+		{
+			"name": "Get employees Data",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Verify that the Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate the correct data of the first employee\", function () {\r",
+							"    \r",
+							"    pm.expect(jsonData[0].Firstname).to.eql(\"Emmet\");\r",
+							"    pm.expect(jsonData[0].Lastname).to.eql(\"Klein\");\r",
+							"    pm.expect(jsonData[0].Car).to.eql(\"Audi\");\r",
+							"    pm.expect(jsonData[0].id).to.eql(\"1\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Verify that specific employee exists\", function () {\r",
+							"    var employeeExist = false;\r",
+							"    var arrayData = jsonData;\r",
+							"    for(var i =0;i<arrayData.length;i++)\r",
+							"    {\r",
+							"        if(arrayData[i].Firstname == \"Zella\")\r",
+							"        {\r",
+							"            employeeExist = true;\r",
+							"            break;\r",
+							"        }\r",
+							"    }\r",
+							"    pm.expect(employeeExist).to.eql(true);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/employee",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"employee"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get single employee",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var randomValue = Math.floor(Math.random()*(20-1+1))+1;\r",
+							"pm.environment.set(\"randomEmpId\", randomValue);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Verify that the random id in the request equals to the returned id in the response\", function () {\r",
+							"\r",
+							"    var jsonData = pm.response.json();\r",
+							"    var randomId = pm.environment.get(\"randomEmpId\");\r",
+							"    var randomIdToStirng = randomId.toString();\r",
+							"    pm.expect(jsonData.id).to.eql(randomIdToStirng);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/employee/{{randomEmpId}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"employee",
+						"{{randomEmpId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add new employee",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Verify that the new employee is created with the valid data\", function () {\r",
+							"    pm.expect(jsonData.Firstname).to.eql(\"Mahmoud\");\r",
+							"    pm.expect(jsonData.Lastname).to.eql(\"Ahmed\");\r",
+							"    pm.expect(jsonData.Car).to.eql(\"Hyundai\");\r",
+							"    pm.expect(jsonData.id).to.eql(\"24\");\r",
+							"\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Firstname\":\"Mahmoud\",\r\n    \"Lastname\":\"Ahmed\",\r\n    \"Car\": \"Hyundai\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/employee",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"employee"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update an employee",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Verify that the car of an employee is changed but the employee data is still correct\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.Car).to.eql(\"BMW\");\r",
+							"    pm.expect(jsonData.Firstname).to.eql(\"Mahmoud\");\r",
+							"    pm.expect(jsonData.Lastname).to.eql(\"Ahmed\");\r",
+							"    pm.expect(jsonData.id).to.eql(\"21\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Firstname\":\"Mahmoud\",\r\n    \"Lastname\":\"Ahmed\",\r\n    \"Car\": \"BMW\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/employee/:id",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"employee",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "21"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete an employee",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/employee/:id",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"employee",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "21"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					"pm.test(\"Verify that the Response time is less than 1 second\", function () {\r",
+					"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+					"});"
+				]
+			}
+		}
+	]
+}
